@@ -34,8 +34,6 @@ class Post(models.Model):
         return self.text
 
 
-
-
 class Comment(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments')
@@ -49,4 +47,5 @@ class Comment(models.Model):
 class Follow(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='follower')
-    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    following = models.ForeignKey(User, on_delete=models.CASCADE,
+                                  related_name='following')

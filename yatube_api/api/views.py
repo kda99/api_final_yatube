@@ -4,6 +4,8 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from posts.models import Post, Group, Follow
 from .serializers import CommentSerializer, PostSerializer, GroupSerializer,\
@@ -86,37 +88,18 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(status=405)
 
 
-# class FollowViewSet(viewsets.ModelViewSet):
-#     serializer_class = FollowSerializer
-#     filter_backends = (DjangoFilterBackend, filter.SearchFilter)
-#     search_fields = ('user__username', 'following__username')
-#
-#     def list(self, request, *args, **kwargs):
-#         queryset = request.user.follower.all()
-#         serializer = FollowSerializer(queryset, many=True)
-#         return Response(serializer.data)
-#     def perform_create(self, serializer):
-#         serializer = FollowSerializer
-#         serializer.save(user=self.request.user, following=self.request.user)
-
-
 class FollowViewSet(viewsets.ModelViewSet):
-    # queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('user__username', 'following__username')
 
     def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
-        new_queryset = Follow.objects.filter(user_id=user_id)
-        return new_queryset
+        queryset = Follow.objects.filter(user=self.request.user)
+        return queryset
 
-    # def perform_create(self, serializer):
-    #     serializer = FollowSerializer
-    #     serializer.save(user=self.request.user, following=self.request.user)
-
-
-    # def list(self, request, *args, **kwargs):
-    #     queryset = request.user.follower.all()
-    #     serializer = FollowSerializer(queryset, many=True)
-    #     return Response(serializer.data)
-
+    def perform_create(self, serializer):
+        if serializer.validated_data['following'] != self.request.user:
+            serializer.save(user=self.request.user)
+        else:
+            return Response(status=400)
