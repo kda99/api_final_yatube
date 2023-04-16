@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from rest_framework.response import Response
 
-from posts.models import Post, Group
-from .serializers import CommentSerializer, PostSerializer, GroupSerializer
+from posts.models import Post, Group, Follow
+from .serializers import CommentSerializer, PostSerializer, GroupSerializer,\
+    FollowSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -81,3 +82,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
             super(GroupViewSet, self).perform_update(serializer)
         return Response(status=405)
 
+
+class FollowViewSet(viewsets.ModelViewSet):
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
