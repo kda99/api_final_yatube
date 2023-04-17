@@ -99,7 +99,4 @@ class FollowViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        if serializer.validated_data['following'] != self.request.user:
-            serializer.save(user=self.request.user)
-        else:
-            return Response(status=400)
+        serializer.save(user=self.request.user)
