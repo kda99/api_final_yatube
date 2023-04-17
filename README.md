@@ -17,7 +17,7 @@ python3 -m venv venv
 ```
 
 ```
-source env/bin/activate
+source venv/bin/activate # у меня windows нет
 ```
 
 Установить зависимости из файла requirements.txt:
@@ -40,4 +40,14 @@ python3 manage.py migrate
 
 ```
 python3 manage.py runserver
+```
+
+Часто используемые запросы:
+
+```
+GET api/v1/posts/ - Получение публикаций
+POST api/v1/posts/ - Создание публикаций
+GET api/v1/posts/{id}/ - Получение публикации
+GET /api/v1/posts/{post_id}/comments/ - Получение комментария
+POST /api/v1/posts/{post_id}/comments/ - Создание комментария
 ```
