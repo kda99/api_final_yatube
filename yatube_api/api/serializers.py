@@ -61,7 +61,6 @@ class FollowSerializer(serializers.ModelSerializer):
                                               ' соответствует!')
         return value
 
-
     def validate(self, attrs):
         user = self.context['request'].user
         following = attrs['following']
