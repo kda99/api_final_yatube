@@ -1,14 +1,13 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters, permissions, mixins
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from rest_framework.response import Response
-from rest_framework import permissions
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework import filters
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins
 
 from posts.models import Post, Group, Follow
+from .permissions import AuthorOrReadOnly
 from .serializers import CommentSerializer, PostSerializer, GroupSerializer,\
     FollowSerializer
 
@@ -17,7 +16,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = LimitOffsetPagination
-    # class_permissions = (AuthorOrReadOnly, )
+    class_permissions = (AuthorOrReadOnly, IsAuthenticated)
 
     def is_author(self, item):
         if isinstance(item, PostSerializer):
@@ -45,6 +44,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
 
     serializer_class = CommentSerializer
+    class_permissions = (AuthorOrReadOnly,)
 
     def get_post(self, ):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
@@ -56,8 +56,6 @@ class CommentViewSet(viewsets.ModelViewSet):
                         post=post)
 
     def perform_update(self, serializer):
-        if serializer.instance.author != self.request.user:
-            raise PermissionDenied('Изменение чужого контента запрещено!')
         super(CommentViewSet, self).perform_update(serializer)
 
     def perform_destroy(self, instance):
@@ -89,14 +87,10 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(status=405)
 
 
-class FollowPermission(mixins.CreateModelMixin,
-                       mixins.DestroyModelMixin,
-                       mixins.ListModelMixin,
-                       viewsets.GenericViewSet):
-    pass
-
-
-class FollowViewSet(FollowPermission):
+class FollowViewSet(mixins.CreateModelMixin,
+                    mixins.DestroyModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
