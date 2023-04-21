@@ -20,6 +20,7 @@ class PostViewSet(viewsets.ModelViewSet):
 # Я Вам в пачке 2 раза писал о том, что без этого метода падают тесты,
 # связанные с манипуляциями с чужими объектами. В permissions.AuthorOrReadOnly
 # есть проверка obj.author == request.user, но это почему-то не работает.
+
     def is_author(self, item):
         if isinstance(item, PostSerializer):
             if item.instance.author != self.request.user:
@@ -57,10 +58,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user,
                         post=post)
 
-    # def perform_destroy(self, instance):
-    #     if instance.author != self.request.user:
-    #         raise PermissionDenied('Изменение чужого контента запрещено!')
-    #     instance.delete()
+    def perform_destroy(self, instance):
+        if instance.author != self.request.user:
+            raise PermissionDenied('Изменение чужого контента запрещено!')
+        instance.delete()
 
     def get_queryset(self):
         post = self.get_post()
