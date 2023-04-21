@@ -1,12 +1,15 @@
 ### Как запустить проект:
 
-Проект оптимизирован только для linux.
-Клонировать репозиторий и перейти в него в командной строке:
 
+Клонировать репозиторий и перейти в него в командной строке:
+ - Linux:
 ```
 git clone https://github.com/kda99/api_final_yatube.git
 ```
-
+ - Windows
+```
+venv/Scripts/activate
+```
 ```
 cd api_final_yatube
 ```

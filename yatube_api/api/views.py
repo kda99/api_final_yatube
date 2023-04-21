@@ -17,7 +17,9 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     pagination_class = LimitOffsetPagination
     class_permissions = (AuthorOrReadOnly, IsAuthenticated)
-
+# Я Вам в пачке 2 раза писал о том, что без этого метода падают тесты,
+# связанные с манипуляциями с чужими объектами. В permissions.AuthorOrReadOnly
+# есть проверка obj.author == request.user, но это почему-то не работает.
     def is_author(self, item):
         if isinstance(item, PostSerializer):
             if item.instance.author != self.request.user:
