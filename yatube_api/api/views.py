@@ -57,13 +57,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user,
                         post=post)
 
-    def perform_update(self, serializer):
-        super(CommentViewSet, self).perform_update(serializer)
-
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise PermissionDenied('Изменение чужого контента запрещено!')
-        instance.delete()
+    # def perform_destroy(self, instance):
+    #     if instance.author != self.request.user:
+    #         raise PermissionDenied('Изменение чужого контента запрещено!')
+    #     instance.delete()
 
     def get_queryset(self):
         post = self.get_post()
